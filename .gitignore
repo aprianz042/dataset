@@ -1,0 +1,16 @@
+__pycache__
+.venv/
+FINAL/
+affectnet_128/
+db_faces/
+db_faces_undersampled_ori/
+db_faces_undersampled_ori - Copy/
+db_hand/
+db_hands/
+FIX_LATIH_UJI/
+rafdb/
+rafdb_128/
+rafdb-ori/
+sintesis/
+.ipynb_checkpoints
+FINAL.zip
