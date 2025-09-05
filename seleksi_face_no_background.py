@@ -5,10 +5,11 @@ import shutil
 import mediapipe as mp
 import math
 
-from frontalization import *
+#from frontalization import *
+from frontal import *
 
-source_dir = "FINAL/6_dataset_affectnet_rafdb_seleksi_wajah_lurus_hand_sintesis"
-target_dir = "FINAL/9_dataset_affectnet_rafdb_seleksi_wajah_lurus_hand_sintesis_no_backgrond"
+source_dir = "SAMPLE/3_dataset_affectnet_rafdb_seleksi_wajah_miring"
+target_dir = "SAMPLE/3_dataset_affectnet_rafdb_seleksi_wajah_miring_no_backgrond"
 
 valid_exts = (".png", ".jpg", ".jpeg", ".bmp")
 image_paths = glob.glob(os.path.join(source_dir, "*", "*.*"))
@@ -22,10 +23,11 @@ for img_path in image_paths:
         filename = parts[-1]
 
         img = cv2.imread(img_path)
-        face_ori = face_no_background(img)
-        _, lm = face_landmark(face_ori)
-        
-        if lm.face_landmarks:
+        _, face_ori, _ = half_flip(img)
+        #cek = cek_landmark_wajah(face_ori)
+
+        #if cek is not None:
+        if face_ori is not None:
             target_folder = os.path.join(target_dir, emotion_label)
             os.makedirs(target_folder, exist_ok=True)
 

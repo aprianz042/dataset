@@ -3,9 +3,9 @@ import random
 import shutil
 
 # Folder asli dan target
-source_dir = "db_faces"
-target_dir = "db_faces_undersampled"
-target_count = 3903  # Jumlah target per kelas (sama seperti 'disgust')
+source_dir = "SAMPLE/4_dataset_affectnet_rafdb_seleksi_wajah_lurus_hand_sintesis_frontal"
+target_dir = "SAMPLE/UNDERSAMPLED FRONTAL/4_dataset_affectnet_rafdb_seleksi_wajah_lurus_hand_sintesis_frontal_undersampled"
+target_count = 400
 
 # Format gambar valid
 valid_exts = (".jpg", ".jpeg", ".png", ".bmp")

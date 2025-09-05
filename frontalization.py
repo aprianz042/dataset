@@ -793,6 +793,7 @@ def half_flip(img):
             hand_masked_ = hand_masked
             output_list.append((hand_masked, None))         
             combine_face_hand = 'True'
+            print("ada tangan")
             
         else:                                               
             combine_face_hand = False                       

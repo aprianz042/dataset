@@ -7,7 +7,7 @@ import math
 
 # Konfigurasi folder
 source_dir = "FINAL/3_dataset_affectnet_rafdb_seleksi_landmark"
-target_dir = "FINAL/5_dataset_affectnet_rafdb_seleksi_wajah_miring"
+target_dir = "FINAL/5_dataset_affectnet_rafdb_seleksi_wajah_miring_diatas_03"
 
 # Inisialisasi MediaPipe FaceMesh
 mp_face_mesh = mp.solutions.face_mesh
@@ -61,8 +61,10 @@ def calculate_roll(landmarks):
     return abs(roll)
 
 # Threshold untuk yaw dan roll
+min_yaw = 0.2
+
 yaw_threshold = 0.3  # Threshold untuk yaw
-roll_threshold = 0.7  # Threshold untuk roll
+roll_threshold = 0.5  # Threshold untuk roll
 
 for img_path in image_paths:
     if not img_path.lower().endswith(valid_exts):
@@ -90,7 +92,9 @@ for img_path in image_paths:
             roll = calculate_roll(landmarks)
 
             # Cek apakah yaw atau roll terlalu besar
-            if abs(yaw) > yaw_threshold or abs(roll) > roll_threshold:
+            #if yaw > min_yaw and yaw < yaw_threshold and roll < roll_threshold:
+            #if yaw > min_yaw and yaw < yaw_threshold and roll < roll_threshold:
+            if yaw > yaw_threshold and roll < roll_threshold:
                 # Buat folder target
                 target_folder = os.path.join(target_dir, emotion_label)
                 os.makedirs(target_folder, exist_ok=True)
