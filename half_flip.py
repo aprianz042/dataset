@@ -8,8 +8,12 @@ import math
 #from frontalization import *
 from frontal import *
 
+#source_dir = "SAMPLE/2_dataset_affectnet_rafdb_seleksi_wajah_lurus_hand_sintesis"
+#target_dir = "SAMPLE/4_dataset_affectnet_rafdb_seleksi_wajah_lurus_hand_sintesis_frontal"
+
 source_dir = "SAMPLE/3_dataset_affectnet_rafdb_seleksi_wajah_miring"
 target_dir = "SAMPLE/5_dataset_affectnet_rafdb_seleksi_wajah_miring_frontal"
+
 
 valid_exts = (".png", ".jpg", ".jpeg", ".bmp")
 image_paths = glob.glob(os.path.join(source_dir, "*", "*.*"))
@@ -24,9 +28,9 @@ for img_path in image_paths:
 
         img = cv2.imread(img_path)
         _, faces = half_flip(img)
-        cek = cek_landmark_wajah(faces)
+        #cek = cek_landmark_wajah(faces)
 
-        if cek is not None:
+        if faces is not None:
             target_folder = os.path.join(target_dir, emotion_label)
             os.makedirs(target_folder, exist_ok=True)
 

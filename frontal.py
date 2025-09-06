@@ -24,7 +24,7 @@ face_mesh = mp_face_mesh.FaceMesh(
     static_image_mode=True,
     max_num_faces=1,
     refine_landmarks=True,      
-    min_detection_confidence=0.5
+    min_detection_confidence=0.6
 )
 
 # Ambil daftar koneksi untuk Tesselation, Contours, dan Irises
@@ -103,17 +103,16 @@ def cek_landmark_wajah(face):
         return stat
 
 ############################################## Koreksi Head Roll ######################################################################################
-def correct_roll(image, pitch, yaw):
+def correct_roll(image, roll, yaw):
     h, w, _ = image.shape
     img_rgb = image
-    yaw = abs(yaw)
     results = face_mesh.process(img_rgb)
     if not results.multi_face_landmarks:
         print('Wajah tidak ditemukan!')
         detected = False
         return image, detected
     for face_landmarks in results.multi_face_landmarks:
-        if pitch < 23 and yaw > 50:
+        if roll > 83 and roll < 97:
             detected = True
             return image, detected
         else:
@@ -126,7 +125,7 @@ def correct_roll(image, pitch, yaw):
             corrected_image = cv2.warpAffine(image, M, (w, h))
             detected = True
             return corrected_image, detected
-
+        
 def get_face_mesh_3d(image):
     h, w, _ = image.shape
     img_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
@@ -139,6 +138,7 @@ def get_face_mesh_3d(image):
     
     return points, face_landmarks
 
+'''
 def compute_yaw_angle(points):
     NOSE_IDX = 1  # Landmark hidung (pusat wajah)
     CHIN_IDX = 152  # Landmark dagu
@@ -148,15 +148,65 @@ def compute_yaw_angle(points):
     dz = chin[2] - nose[2]
     yaw_angle = np.degrees(np.arctan2(dx, dz))
     return yaw_angle
+'''
+def compute_yaw_angle(points):
+    KANAN = 468    
+    KIRI = 173  
+    TENGAH = 168
+    eyeKanan = points[KANAN]
+    eyeKiri = points[KIRI]
+    tengah_ = points[TENGAH]
+    jkanan = abs(tengah_[0] - eyeKanan[0])
+    jkiri = abs(tengah_[0] - eyeKiri[0])
+    yaw = abs(jkanan / jkiri)
+    dx = round(yaw, 2)  
+    return dx
 
-def compute_pitch_angle(points):
-    NOSE_IDX = 152    # Landmark hidung (pusat wajah)
+def compute_head_angle(points):
+    NOSE_IDX = 164    # Landmark hidung (pusat wajah)
     FOREHEAD_IDX = 151  # Landmark dahi (titik tinggi di wajah)
+    
     nose = points[NOSE_IDX]
     forehead = points[FOREHEAD_IDX]
-    dx = abs(forehead[0] - nose[0])
-    dx = round(dx, 2)  
-    return dx
+ 
+    HIDUNG = 4
+    PANGKAL = 2
+
+    hid = points[HIDUNG]
+    pang = points[PANGKAL]
+        
+    #=======yaw==========
+    r1, s1 = hid[0], hid[2]
+    r2, s2 = pang[0], hid[1]
+    fx = r2 - r1
+    fy = s2 - s1
+    _radians = math.atan2(fy, fx)
+    yaw = math.degrees(_radians)
+    yaw = 90 - yaw
+    yaw = abs(yaw)
+
+    #=======pitch==========
+    a1, b1 = nose[1], nose[2]
+    a2, b2 = forehead[1], forehead[2]
+    bx = a2 - a1
+    by = b2 - b1
+    _radian = math.atan2(by, bx)
+    pitch = math.degrees(_radian)
+    pitch = abs(pitch)
+    
+    #=======roll==========
+    x1, y1 = nose[0], nose[1]
+    x2, y2 = forehead[0], forehead[1]
+    dx = x2 - x1
+    dy = y2 - y1
+    theta_radian = math.atan2(dy, dx)
+    roll = math.degrees(theta_radian)
+    roll = abs(roll)
+
+    pitch = round(pitch, 2)
+    roll = round(roll, 2)  
+    yaw = round(yaw, 2)
+    return pitch, roll, yaw
 
 def convert_to_2d_xy(points):
     points_2d_xy = points[:, :2]  # Ambil hanya X dan Y
@@ -431,7 +481,7 @@ def warp_poin(point, yaw): #poin warping baru (x lurus)
     if yaw < 10:
         xp, yp = poin[13]
     else:
-        xp, yp = poin[22]
+        xp, yp = poin[23]
     poin[:26] = [(xp, y) for (_, y) in poin[:26]]
     return poin
 
@@ -488,38 +538,40 @@ def show_images_grid(image_list, figsize=(12, 12)):
 def half_flip(img):  
     images = img   
     img_h, img_w, _ = images.shape 
-    
-    img_ori = images.copy() 
-    points_, _ = get_face_mesh_3d(img_ori)
-    pitch = compute_pitch_angle(points_)  
-    yaw = compute_yaw_angle(points_)
-    print(pitch) 
-    print(abs(yaw)) 
 
-    img_roll, face_detected = correct_roll(img_ori, pitch, yaw)                          # img_roll = headpose yang sudah di luruskan (yang diproses selanjutnya)
-    img_r = img_roll.copy()                                   # img_roll yang tidak di proses (untuk visualisasi)
-
-    img_rr = img_roll.copy()
-    img_rr = blurring_hand(img_rr)
-
-    output_list = []  
-            
-    output_list.append((img_ori, cv2.COLOR_RGB2BGR))          # ----> img_ori tanpa landmark
-    output_list.append((img_r, cv2.COLOR_RGB2BGR))           # ----> img_roll tanpa landmark
-    output_list.append((img_rr, cv2.COLOR_RGB2BGR))
-
-    '''
     if img_h < 500:
         new_height = 500                                          # ukuran tinggi image (sesuaikan)
         (h, w) = images.shape[:2]
         aspect_ratio = w / h
         new_width = int(new_height * aspect_ratio)
         images = cv2.resize(images, (new_width, new_height))      # resize tinggi image ke ukuran baru
-    '''    
+
+    output_list = []  
+    landm = images.copy() 
+    land, _ = landmark_wajah(landm)
+    output_list.append((land, cv2.COLOR_RGB2BGR))
+
+    img_ori = images.copy() 
+    points_, _ = get_face_mesh_3d(img_ori)
+    pitch, roll, yaw = compute_head_angle(points_)  
+    print(f'pitch: {pitch}') 
+    print(f'roll: {roll}') 
+    print(f'yaw: {yaw}') 
+
+    img_roll, face_detected = correct_roll(img_ori, roll, yaw)                          # img_roll = headpose yang sudah di luruskan (yang diproses selanjutnya)
+    img_r = img_roll.copy()                                   # img_roll yang tidak di proses (untuk visualisasi)
+
+    img_rr = img_roll.copy()
+    img_rr = blurring_hand(img_rr)
+
+    
+    #output_list.append((img_ori, cv2.COLOR_RGB2BGR))          # ----> img_ori tanpa landmark
+    output_list.append((img_r, cv2.COLOR_RGB2BGR))           # ----> img_roll tanpa landmark
+    output_list.append((img_rr, cv2.COLOR_RGB2BGR))
 
     if face_detected == True:
         points_3d, _ = get_face_mesh_3d(img_r)
-        yaw_angle = compute_yaw_angle(points_3d)
+        _, _, yaw_angle = compute_head_angle(points_3d)
         
 
         img_height, img_width, _ = img_roll.shape 
@@ -550,7 +602,7 @@ def half_flip(img):
         warpp_full = images_warping(img_r, poin_wajah_full, poin_wajah_full)
         face_ori = potong_area_(warpp_full, poin_wajah_full)
         #face_ori = cv2.resize(face_ori, (224, 224))
-        output_list.append((warpp_full, None))
+        #output_list.append((warpp_full, None))
         ######################## END - landmarking full wajah #########################################################################################
             
         
@@ -558,7 +610,7 @@ def half_flip(img):
         poin_wajah_kiri = wajah_kiri(dua_D)
         face_kiri_masked = masking_img(img_roll, poin_wajah_kiri, 'putih')
         landmark_warp_kiri = warp_poin(poin_wajah_kiri, yaw_angle)                # proses warping poin objek mask putih tengah wajah
-        output_list.append((face_kiri_masked, None))
+        #output_list.append((face_kiri_masked, None))
         ######################## END - landmarking wajah kiri #########################################################################################
         
         
@@ -566,7 +618,7 @@ def half_flip(img):
         poin_wajah_kanan = wajah_kanan(dua_D)
         face_kanan_masked = masking_img(img_roll, poin_wajah_kanan, 'putih')
         landmark_warp_kanan = warp_poin(poin_wajah_kanan, yaw_angle)              # proses warping poin objek mask putih tengah wajah
-        output_list.append((face_kanan_masked, None))
+        #output_list.append((face_kanan_masked, None))
         ######################## END - landmarking wajah kanan ########################################################################################
 
 
@@ -576,6 +628,7 @@ def half_flip(img):
             mask_hand_full = np.any(hand_masked != [0, 0, 0], axis=-1)
             hasil_full = wajah_full_masked
             hasil_full[mask_hand_full] = hand_masked[mask_hand_full]
+            output_list.append((hasil_full, None))
             
             mask_hand_kanan = np.any(hand_masked != [0, 0, 0], axis=-1)
             hasil_kanan = face_kanan_masked.copy()
@@ -589,33 +642,40 @@ def half_flip(img):
         else:                              
             hasil_kanan = face_kanan_masked.copy()                         # hasil_kiri = tangan kiri dan wajah kanan               
             hasil_kiri = face_kiri_masked.copy()                           # hasil_kiri = tangan kiri dan wajah kanan                
+
+        output_list.append((hasil_kiri, None))
+        output_list.append((hasil_kanan, None))
         ######################## END - Combine Wajah & Hand ###########################################################################################
         
         ######################## warping wajah asli kiri - START ######################################################################################
         poin_wajah_kiri = wajah_kiri(dua_D)
         landmark_warp_kiri = warp_poin(poin_wajah_kiri, yaw_angle)
         warpp_kiri = images_warping(img_rr, poin_wajah_kiri, landmark_warp_kiri)
-        output_list.append((warpp_kiri, cv2.COLOR_BGR2RGB))
+        output_list.append((warpp_kiri, None))
         ######################## END - warping wajah asli kiri ########################################################################################
             
         ######################## warping wajah asli kanan - START #####################################################################################                            
         poin_wajah_kanan = wajah_kanan(dua_D)
         landmark_warp_kanan = warp_poin(poin_wajah_kanan, yaw_angle)
         warpp_kanan = images_warping(img_rr, poin_wajah_kanan, landmark_warp_kanan)
-        output_list.append((warpp_kanan, cv2.COLOR_BGR2RGB))
+        output_list.append((warpp_kanan, None))
         ######################## END - warping wajah asli kanan #######################################################################################
-    
+
         ######################## proses membandingkan luas wajah kanan dan kiri  - START ##############################################################
         luas_kiri = luas_wajah(hasil_kiri)
         luas_kanan = luas_wajah(hasil_kanan)
         if luas_kiri > luas_kanan:                                        # jika lebih luas kiri maka bagian kiri wajah yang dipakai
-            half_face = warpp_kiri
-            half_face = potong_area_(half_face, landmark_warp_kiri)       # proses memotong hanya bagian wajah
+            #half_face = warpp_kiri
+            clean_land_kiri = [ (max(0, int(x)), max(0, int(y))) for (x, y) in landmark_warp_kiri ]
+            half_face = potong_area_(warpp_kiri, clean_land_kiri)       # proses memotong hanya bagian wajah
+            output_list.append((half_face, None))
             flip_image = cv2.flip(half_face, 1)                           # flip wajah
             combine = np.concatenate((half_face, flip_image), axis=1)     # gabungkan wajah kanan kiri            
         else:                                                             # jika lebih luas kanan maka bagian kanan wajah yang dipakai
-            half_face = warpp_kanan
-            half_face = potong_area_(half_face, landmark_warp_kanan)      # proses memotong hanya bagian wajah
+            #half_face = warpp_kanan
+            clean_land_kanan = [ (max(0, int(x)), max(0, int(y))) for (x, y) in landmark_warp_kanan ]
+            half_face = potong_area_(warpp_kanan, clean_land_kanan)      # proses memotong hanya bagian wajah
+            output_list.append((half_face, None))
             flip_image = cv2.flip(half_face, 1)                           # flip wajah
             combine = np.concatenate((flip_image, half_face), axis=1)     # gabungkan wajah kanan kanan
         ######################## END - proses membandingkan luas wajah kanan dan kiri #################################################################
