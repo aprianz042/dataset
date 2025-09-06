@@ -103,16 +103,17 @@ def cek_landmark_wajah(face):
         return stat
 
 ############################################## Koreksi Head Roll ######################################################################################
-def correct_roll(image, pitch):
+def correct_roll(image, pitch, yaw):
     h, w, _ = image.shape
     img_rgb = image
+    yaw = abs(yaw)
     results = face_mesh.process(img_rgb)
     if not results.multi_face_landmarks:
         print('Wajah tidak ditemukan!')
         detected = False
         return image, detected
     for face_landmarks in results.multi_face_landmarks:
-        if pitch < 20:
+        if pitch < 23 and yaw > 50:
             detected = True
             return image, detected
         else:
@@ -491,9 +492,11 @@ def half_flip(img):
     img_ori = images.copy() 
     points_, _ = get_face_mesh_3d(img_ori)
     pitch = compute_pitch_angle(points_)  
-    #print(pitch)                                # img_ori = gambar asli
+    yaw = compute_yaw_angle(points_)
+    print(pitch) 
+    print(abs(yaw)) 
 
-    img_roll, face_detected = correct_roll(img_ori, pitch)                          # img_roll = headpose yang sudah di luruskan (yang diproses selanjutnya)
+    img_roll, face_detected = correct_roll(img_ori, pitch, yaw)                          # img_roll = headpose yang sudah di luruskan (yang diproses selanjutnya)
     img_r = img_roll.copy()                                   # img_roll yang tidak di proses (untuk visualisasi)
 
     img_rr = img_roll.copy()
