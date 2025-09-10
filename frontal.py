@@ -27,6 +27,13 @@ face_mesh = mp_face_mesh.FaceMesh(
     min_detection_confidence=0.6
 )
 
+face_mesh_cek = mp_face_mesh.FaceMesh(
+    static_image_mode=True,
+    max_num_faces=1,
+    refine_landmarks=True,      
+    min_detection_confidence=0.8
+)
+
 # Ambil daftar koneksi untuk Tesselation, Contours, dan Irises
 connections = {
     "tesselation": (mp_face_mesh.FACEMESH_TESSELATION, 'cyan'),
@@ -95,7 +102,7 @@ def coordinate_landmark(wajah, landmark):
 
 def cek_landmark_wajah(face):
     annotated_image = face
-    results = face_mesh.process(annotated_image)
+    results = face_mesh_cek.process(annotated_image)
     if not results.multi_face_landmarks:
         return None
     else:
