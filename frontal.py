@@ -67,7 +67,11 @@ def landmark_tangan(tangan):
     return img_copy[:,:,::-1], list_hand
 
 def landmark_wajah(face):
-    annotated_image = face
+    height, width, _ = face.shape
+    annotated_image = 255 * np.ones(shape=[height, width, 3], dtype=np.uint8)  # Background putih
+
+    #annotated_image = face
+
     results = face_mesh.process(cv2.cvtColor(face, cv2.COLOR_BGR2RGB))
     if not results.multi_face_landmarks:
         stat = None
@@ -545,6 +549,10 @@ def show_images_grid(image_list, figsize=(12, 12)):
 def half_flip(img):  
     images = img   
     img_h, img_w, _ = images.shape 
+    output_list = [] 
+    
+    img_asli = images.copy()
+    output_list.append((img_asli, cv2.COLOR_RGB2BGR))          # ----> img_ori tanpa landmark
 
     if img_h < 500:
         new_height = 500                                          # ukuran tinggi image (sesuaikan)
@@ -553,7 +561,7 @@ def half_flip(img):
         new_width = int(new_height * aspect_ratio)
         images = cv2.resize(images, (new_width, new_height))      # resize tinggi image ke ukuran baru
 
-    output_list = []  
+     
     landm = images.copy() 
     land, _ = landmark_wajah(landm)
     output_list.append((land, cv2.COLOR_RGB2BGR))
@@ -572,7 +580,7 @@ def half_flip(img):
     img_rr = blurring_hand(img_rr)
 
     
-    #output_list.append((img_ori, cv2.COLOR_RGB2BGR))          # ----> img_ori tanpa landmark
+    
     output_list.append((img_r, cv2.COLOR_RGB2BGR))           # ----> img_roll tanpa landmark
     output_list.append((img_rr, cv2.COLOR_RGB2BGR))
 
@@ -605,9 +613,9 @@ def half_flip(img):
         ######################## landmarking full wajah - START #######################################################################################
         poin_wajah_full = list_poin_wajah(dua_D)
         wajah_full_masked = masking_img(img_roll, poin_wajah_full, 'putih')
-        output_list.append((wajah_full_masked, None))
-        warpp_full = images_warping(img_r, poin_wajah_full, poin_wajah_full)
-        face_ori = potong_area_(warpp_full, poin_wajah_full)
+        #output_list.append((wajah_full_masked, None))
+        #warpp_full = images_warping(img_r, poin_wajah_full, poin_wajah_full)
+        #face_ori = potong_area_(warpp_full, poin_wajah_full)
         #face_ori = cv2.resize(face_ori, (224, 224))
         #output_list.append((warpp_full, None))
         ######################## END - landmarking full wajah #########################################################################################
