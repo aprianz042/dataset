@@ -3,9 +3,10 @@ import cv2
 import glob
 import shutil
 import mediapipe as mp
+from frontal import *
 
 # Konfigurasi folder
-source_dir = "SAMPLE/2_dataset_affectnet_rafdb_seleksi_wajah_lurus_hand_sintesis"
+source_dir = "SAMPLE/before"
 target_dir = "SAMPLE/6_hand_fail"
 
 # Inisialisasi MediaPipe Hand
@@ -29,27 +30,26 @@ for img_path in image_paths:
         filename = parts[-1]
 
         # Baca dan konversi gambar ke RGB
-        img_bgr = cv2.imread(img_path)
-        if img_bgr is None:
-            print(f"⚠️ Tidak bisa dibaca: {img_path}")
-            continue
-        img_rgb = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB)
-
-        # Deteksi tangan
-        result = hands.process(img_rgb)
+        img_rgb = cv2.imread(img_path)
+        
+        points_, _ = get_face_mesh_3d(img_rgb)
+        pitch, roll, yaw = compute_head_angle(points_)  
+       
+        img_roll, face_detected = correct_roll(img_rgb, roll, yaw)
+        _, list_hand = landmark_tangan(img_roll) 
+        sum_of_hand = len(list_hand)
 
         # Cek apakah tangan terdeteksi
-        if result.multi_hand_landmarks and len(result.multi_hand_landmarks) > 0:
-            # Buat folder target
+        if sum_of_hand == 0:  
             target_folder = os.path.join(target_dir, emotion_label)
             os.makedirs(target_folder, exist_ok=True)
 
-            # Salin file ke folder baru
             target_path = os.path.join(target_folder, filename)
             shutil.copy2(img_path, target_path)
-            print(f"✔️ Tangan terdeteksi, disalin: {target_path}")
+            print(f"❌ Tangan tidak terdeteksi, disalin: {target_path}")
+            
         else:
-            print(f"❌ Tidak ada tangan: {img_path}")
+            print(f"✔️ ada tangan: {img_path}")
 
     except Exception as e:
         print(f"❌ Error proses {img_path} - {e}")

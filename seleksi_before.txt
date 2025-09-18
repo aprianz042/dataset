@@ -1,0 +1,48 @@
+import os
+import cv2
+import glob
+import shutil
+import mediapipe as mp
+from frontal import *
+
+# Konfigurasi folder
+source_dir = "SAMPLE/2_dataset_affectnet_rafdb_seleksi_wajah_lurus_hand_sintesis"
+target_dir = "SAMPLE/4_dataset_affectnet_rafdb_seleksi_wajah_lurus_hand_sintesis_frontal"
+dir_output = "SAMPLE/before"
+
+# Inisialisasi MediaPipe Hand
+mp_hands = mp.solutions.hands
+hands = mp_hands.Hands(static_image_mode=True, max_num_hands=2, model_complexity=1)
+
+# Format file yang didukung
+valid_exts = (".png", ".jpg", ".jpeg", ".bmp")
+
+# Ambil semua file gambar dari subfolder
+image_paths = glob.glob(os.path.join(source_dir, "*", "*.*"))
+
+for img_path in image_paths:
+    if not img_path.lower().endswith(valid_exts):
+        continue
+
+    try:
+        # Ambil label dan nama file
+        parts = img_path.split(os.sep)
+        emotion_label = parts[-2]
+        filename = parts[-1]
+
+        # Tentukan path target file
+        target_folder = os.path.join(target_dir, emotion_label)
+        target_path = os.path.join(target_folder, filename)
+
+        # Cek apakah file sudah ada di target folder
+        if os.path.exists(target_path):
+            # Jika file sudah ada, salin ke dir_output
+            output_folder = os.path.join(dir_output, emotion_label)
+            os.makedirs(output_folder, exist_ok=True)
+
+            output_path = os.path.join(output_folder, filename)
+            shutil.copy2(img_path, output_path)
+            print(f"File sudah ada di target, disalin ke folder output: {output_path}")
+
+    except Exception as e:
+        print(f"❌ Error proses {img_path} - {e}")

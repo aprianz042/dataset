@@ -561,7 +561,6 @@ def half_flip(img):
         new_width = int(new_height * aspect_ratio)
         images = cv2.resize(images, (new_width, new_height))      # resize tinggi image ke ukuran baru
 
-     
     landm = images.copy() 
     land, _ = landmark_wajah(landm)
     output_list.append((land, cv2.COLOR_RGB2BGR))
@@ -569,9 +568,9 @@ def half_flip(img):
     img_ori = images.copy() 
     points_, _ = get_face_mesh_3d(img_ori)
     pitch, roll, yaw = compute_head_angle(points_)  
-    print(f'pitch: {pitch}') 
-    print(f'roll: {roll}') 
-    print(f'yaw: {yaw}') 
+    #print(f'pitch: {pitch}') 
+    #print(f'roll: {roll}') 
+    #print(f'yaw: {yaw}') 
 
     img_roll, face_detected = correct_roll(img_ori, roll, yaw)                          # img_roll = headpose yang sudah di luruskan (yang diproses selanjutnya)
     img_r = img_roll.copy()                                   # img_roll yang tidak di proses (untuk visualisasi)
@@ -594,6 +593,7 @@ def half_flip(img):
         ######################## Proses Landmarking Tangan - START ########################################################################################
         _, list_hand = landmark_tangan(img_roll)          # proses landmarking tangan
         sum_of_hand = len(list_hand)
+        print(sum_of_hand)
         if sum_of_hand > 0:                                    # jika tangan terdeteksi hanya 1
             hand_masked = masking_tangan_canvas_hitam(img_roll)
             output_list.append((hand_masked, None))
