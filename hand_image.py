@@ -9,11 +9,11 @@ def hand_random():
     gambar_list = ["hand1.png", "hand2.png", "hand3.png"]
     tangan = random.choice(tangan_list)
     gambar = random.choice(gambar_list)
-    path = f"hand/{tangan}/{gambar}"
+    path = f"hand_horizontal/{tangan}/{gambar}"
     return tangan, path
 
 # ==== Konfigurasi ====
-input_image_path = 'db_head_straight/angry/angry_0012.jpg'        # Gambar wajah input
+input_image_path = 'SAMPLE/1_dataset_affectnet_rafdb_seleksi_wajah_lurus/angry/angry_0026.jpg'        # Gambar wajah input
 #input_image_path = 'db_head_not_straight/angry/angry_3093.jpg'
 output_image_path = 'output.png'                                  # Gambar hasil setelah tangan ditempel
 tangan, hand_image_path = hand_random()                     
@@ -80,7 +80,7 @@ if results.multi_face_landmarks:
         face_width = np.linalg.norm([x2 - x1, y2 - y1])
 
         # --- Resize gambar tangan berdasarkan lebar wajah ---
-        desired_width = int(face_width * 0.5 + 10)
+        desired_width = int((face_width * 0.5) + 50)
         scale_ratio = desired_width / hand_img.shape[1]
         resized_hand = cv2.resize(hand_img, None, fx=scale_ratio, fy=scale_ratio, interpolation=cv2.INTER_AREA)
 
@@ -113,11 +113,12 @@ if results.multi_face_landmarks:
         py = int(center_landmark.y * ih)
 
         # --- Offset posisi tangan (atur sesuai kebutuhan) ---
+        letak = 4
         if tangan == "kanan":  # geser kiri/kanan
-            offset_x = int(px - rotated_hand.shape[1] * 0.5 - 35)
+            offset_x = int(px - rotated_hand.shape[1] * 0.5 - letak)
         else:
-            offset_x = int(px - rotated_hand.shape[1] * 0.5 + 35) 
-        offset_y = int(py - rotated_hand.shape[0] * 0.5) # geser atas/bawah
+            offset_x = int(px - rotated_hand.shape[1] * 0.5 + letak) 
+        offset_y = int(py - rotated_hand.shape[0] * 0.5 + 15) # geser atas/bawah
 
         # --- Tempel tangan ke gambar wajah ---
         image = overlay_transparent(image, rotated_hand, offset_x, offset_y)
