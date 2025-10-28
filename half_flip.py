@@ -8,12 +8,13 @@ import math
 #from frontalization import *
 from frontal import *
 
-#source_dir = "SAMPLE/2_dataset_affectnet_rafdb_seleksi_wajah_lurus_hand_sintesis"
-#target_dir = "SAMPLE/4_dataset_affectnet_rafdb_seleksi_wajah_lurus_hand_sintesis_frontal"
+'''
+source_dir = "SAMPLE/rafdb_miring"
+target_dir = "SAMPLE/rafdb_miring_frontal"
+'''
 
-source_dir = "SAMPLE/3_dataset_affectnet_rafdb_seleksi_wajah_miring"
-target_dir = "SAMPLE/5_dataset_affectnet_rafdb_seleksi_wajah_miring_frontal"
-
+source_dir = "SAMPLE/rafdb_lurus_hand_horizontal"
+target_dir = "SAMPLE/rafdb_lurus_hand_horizontal_frontal"
 
 valid_exts = (".png", ".jpg", ".jpeg", ".bmp")
 image_paths = glob.glob(os.path.join(source_dir, "*", "*.*"))

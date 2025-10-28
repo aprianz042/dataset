@@ -13,8 +13,9 @@ path = "SAMPLE/3_dataset_affectnet_rafdb_seleksi_wajah_miring/happy/happy_1400.j
 #path = "SAMPLE/3_dataset_affectnet_rafdb_seleksi_wajah_miring/disgust/disgust_2859.jpg"
 path = "SAMPLE/3_dataset_affectnet_rafdb_seleksi_wajah_miring/fear/fear_1617.jpg"
 
-path = "SAMPLE/2_dataset_affectnet_rafdb_seleksi_wajah_lurus_hand_sintesis/angry/angry_0485.jpg"
-#path = "SAMPLE/2_dataset_affectnet_rafdb_seleksi_wajah_lurus_hand_sintesis/angry/angry_0156.jpg"
+#path = "SAMPLE/2_dataset_affectnet_rafdb_seleksi_wajah_lurus_horizontal/angry/angry_0485.jpg"
+#path = "SAMPLE/2_dataset_affectnet_rafdb_seleksi_wajah_lurus_horizontal/angry/angry_0158.jpg"
+#path = "SAMPLE/2_dataset_affectnet_rafdb_seleksi_wajah_lurus_hand_sintesis/disgust/disgust_0025.jpg"
 
 path = cv2.imread(path)
 #path = cv2.cvtColor(path, cv2.COLOR_BGR2RGB)

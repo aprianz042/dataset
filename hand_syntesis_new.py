@@ -243,8 +243,8 @@ def overlay_transparent(background, overlay, x, y):
     return background
 
 
-input_root = "FINAL/4_dataset_affectnet_rafdb_seleksi_wajah_lurus"
-output_root = "FINAL/6_dataset_affectnet_rafdb_seleksi_wajah_lurus_hand_sintesis"
+input_root = "SAMPLE/rafdb_lurus"
+output_root = "SAMPLE/rafdb_lurus_hand"
 
 for subfolder in os.listdir(input_root):
     subfolder_path = os.path.join(input_root, subfolder)
@@ -310,9 +310,9 @@ for subfolder in os.listdir(input_root):
                 py = int(center.y * ih)
 
                 if tangan == "kanan":  
-                    offset_x = int(px - rotated_hand.shape[1] * 0.5 - 28)
+                    offset_x = int(px - rotated_hand.shape[1] * 0.5 - 38)
                 else:
-                    offset_x = int(px - rotated_hand.shape[1] * 0.5 + 28) 
+                    offset_x = int(px - rotated_hand.shape[1] * 0.5 + 38) 
                 offset_y = int(py - rotated_hand.shape[0] * 0.5)
 
                 # Tempel tangan

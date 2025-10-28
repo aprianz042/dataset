@@ -310,8 +310,9 @@ def rgb2mesh(imgs):
         #result_lbl.append('landmark asli')
         
         # Koreksi Roll
-        roll_angle = compute_roll_angle(points_3d)
-        points_3d = rotate(points_3d, -roll_angle, axis='z')  
+        #roll_angle = compute_roll_angle(points_3d)
+        #points_3d = rotate(points_3d, -roll_angle, axis='z')  
+        
         #points_2d_xy = convert_to_2d_xy(points_3d)
         #plot_2d_face(points_2d_xy, title="Koreksi Roll")
         #roll = save_2d_face(points_2d_xy, 'ubah')
@@ -347,11 +348,11 @@ result_lbl = []
 #image = cv2.imread("uji4.jpg")
 #image_files = glob.glob("kepala_miring/*.jpg") 
 
-DATASET_PATH = 'FINAL/13_dataset_affectnet_rafdb_seleksi_wajah_miring_diatas_03_frontal'
+DATASET_PATH = 'SAMPLE/5_dataset_affectnet_rafdb_seleksi_wajah_miring_frontal'
 #LABELS = ["angry", "disgust", "fear", "happy", "neutral", "sad", "surprise"]
 LABELS = [d for d in os.listdir(DATASET_PATH) if os.path.isdir(os.path.join(DATASET_PATH, d))]
 
-output_folder = 'FINAL/13_dataset_affectnet_rafdb_seleksi_wajah_miring_diatas_03_frontal_mesh'
+output_folder = 'SAMPLE/mesh/5_dataset_affectnet_rafdb_seleksi_wajah_miring_frontal_mesh'
 os.makedirs(output_folder, exist_ok=True)
 
 z = 0
